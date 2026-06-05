@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Sound Enhancement"
+rootProject.name = "Dice roller"
 include(":app")

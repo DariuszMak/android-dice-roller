@@ -1,4 +1,4 @@
-package com.example.soundenhancement
+package com.example.diceroller
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

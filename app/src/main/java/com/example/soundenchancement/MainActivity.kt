@@ -1,4 +1,4 @@
-package com.example.soundenhancement
+package com.example.diceroller
 
 import android.content.ComponentName
 import android.content.Intent
