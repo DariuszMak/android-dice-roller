@@ -132,7 +132,7 @@ class DiceActivity : AppCompatActivity() {
                             delay(4)
                         }
 
-                        if (!buttonPressed || holdLevel == 255) break
+                        if (!buttonPressed || holdLevel == 20) break
                     }
 
                     break@tLoop
@@ -166,8 +166,8 @@ class DiceActivity : AppCompatActivity() {
                 while (face <= n) {
                     val denominator = (maxFaces + 1) - face
                     val delayMs = if (denominator > 0) {
-                        ((2 + 1500 / holdLevel) / denominator).toLong().coerceAtLeast(16L)
-                    } else 16L
+                        ((2 + 1500 / holdLevel) / denominator).toLong().coerceAtLeast(40L)  // was 16L
+                    } else 40L
 
                     delay(delayMs)
                     segmentView.showDigit(face)
