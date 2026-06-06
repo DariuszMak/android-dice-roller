@@ -6,7 +6,6 @@ import org.junit.Test
 
 class DiceRollLogicTest {
 
-
     @Test
     fun seedMultiplication_nonZeroResult() {
         var i = 1
@@ -27,7 +26,6 @@ class DiceRollLogicTest {
         assertEquals(1, i)
     }
 
-    // AVR: n=rand()%6+1 — result always 1..6
     @Test
     fun randomDiceFace_alwaysInRange() {
         repeat(10_000) {
@@ -35,7 +33,6 @@ class DiceRollLogicTest {
             assertTrue("n=$n out of range", n in 1..6)
         }
     }
-
 
     @Test
     fun outerLoop_runsExactCount() {
@@ -49,7 +46,6 @@ class DiceRollLogicTest {
         assertEquals(5, callCount)
         assertTrue(n in 1..6)
     }
-
 
     @Test
     fun delayFormula_decreasesAsFaceIncreases() {
@@ -75,7 +71,6 @@ class DiceRollLogicTest {
         }
     }
 
-
     @Test
     fun holdDelay_decreasesWithL() {
         val prev = (500 / 1 + 15).toLong()
@@ -88,7 +83,6 @@ class DiceRollLogicTest {
         val d = (500 / 255 + 15).toLong()
         assertEquals(16L, d.coerceAtLeast(16L))
     }
-
 
     @Test
     fun startupAnimation_sevenSteps() {
@@ -110,7 +104,6 @@ class DiceRollLogicTest {
         assertEquals(7, segSequence.toSet().size)
     }
 
-
     @Test
     fun holdCount_clampsAt255() {
         var l = 0
@@ -120,7 +113,6 @@ class DiceRollLogicTest {
         }
         assertEquals(255, l)
     }
-
 
     @Test
     fun rollLoop_lDecrementsToOne() {
