@@ -1,4 +1,4 @@
-package com.example.soundenhancement
+package com.example.diceroller
 
 import android.content.Context
 import androidx.test.core.app.ActivityScenario

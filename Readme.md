@@ -8,7 +8,7 @@
   </tr>
   <tr>
     <td align="center">
-      <a href="https://github.com/DariuszMak/sound-enhancement-android-app/releases/download/1.3.5/app-release.apk">
+      <a href="https://github.com/DariuszMak/dice-roller-android-app/releases/download/1.3.5/app-release.apk">
         <img src="images/app.jpg" width="200px" alt="App Preview">
       </a>
     </td>

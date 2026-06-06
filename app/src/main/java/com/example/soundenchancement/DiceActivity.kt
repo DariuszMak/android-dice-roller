@@ -1,4 +1,4 @@
-package com.example.soundenhancement
+package com.example.diceroller
 
 import android.annotation.SuppressLint
 import android.content.Context

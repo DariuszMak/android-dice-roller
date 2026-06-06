@@ -1,4 +1,4 @@
-package com.example.soundenhancement
+package com.example.diceroller
 
 import android.content.Context
 import android.graphics.Canvas
