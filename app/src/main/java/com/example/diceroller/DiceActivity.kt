@@ -132,7 +132,7 @@ class DiceActivity : AppCompatActivity() {
                             delay(4)
                         }
 
-                        if (!buttonPressed || holdLevel == 255) break
+                        if (!buttonPressed || holdLevel == 63) break
                     }
 
                     break@tLoop
@@ -205,7 +205,7 @@ class DiceActivity : AppCompatActivity() {
 
     private fun buzz(durationMs: Long) {
         var prolonged_duration = durationMs * 100
-        
+
         toneGenerator?.stopTone()
         toneGenerator?.startTone(
             ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,
