@@ -64,7 +64,7 @@ class SevenSegmentView @JvmOverloads constructor(
         val w = width.toFloat()
         val h = height.toFloat()
 
-        // 🔥 narrower digit
+        
         val widthScale = 0.72f
         val heightScale = 0.90f
 
@@ -74,10 +74,10 @@ class SevenSegmentView @JvmOverloads constructor(
         val offsetX = (w - dw) / 2f
         val offsetY = (h - dh) / 2f
 
-        // segment thickness
+        
         val t = dw * 0.12f
 
-        // 🔥 IMPORTANT: real gap prevents overlap
+        
         val gap = t * 0.35f
 
         val left = offsetX + gap
@@ -133,7 +133,7 @@ class SevenSegmentView @JvmOverloads constructor(
         // G
         drawH(left, right, midY, isOn(6))
 
-        // decimal point
+        
         val dpR = t * 0.45f
         val dpX = right + dpR * 1.6f
         val dpY = bottom
