@@ -142,9 +142,10 @@ class DiceActivityTest {
         Thread.sleep(500)
         release()
         waitForHint("Hold to roll again")
+
         var bits = -1
         scenario.onActivity { activity ->
-            bits = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).getCurrentBits()
+            bits = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).getSegmentBits()
         }
         assertNotEquals(0, bits)
     }
