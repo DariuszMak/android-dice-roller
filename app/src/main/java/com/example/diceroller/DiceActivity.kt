@@ -154,31 +154,23 @@ class DiceActivity : AppCompatActivity() {
 
             val safeHoldLevel = holdLevel.coerceAtLeast(1)
 
-            var outerI = i
             var n = 0
+            for (k in i downTo 1) {
+                n = Random.nextInt(1, maxFaces + 1)
+            }
+
             var face = 1
+            while (face <= n) {
+                val denominator = (maxFaces + 1) - face
+                val delayMs = if (denominator > 0) {
+                    ((2 + 1500 / safeHoldLevel) / denominator).toLong().coerceAtLeast(16L)
+                } else 16L
 
-            while (currentCoroutineContext().isActive) {
+                delay(delayMs)
+                segmentView.showDigit(face)
+                buzz(1L)
 
-                for (k in outerI downTo 1) {
-                    n = Random.nextInt(1, maxFaces + 1)
-                }
-
-                face = 1
-                while (face <= n) {
-                    val denominator = (maxFaces + 1) - face
-                    val delayMs = if (denominator > 0) {
-                        ((2 + 1500 / safeHoldLevel) / denominator).toLong().coerceAtLeast(16L)
-                    } else 16L
-
-                    delay(delayMs)
-                    segmentView.showDigit(face)
-                    buzz(1L)
-
-                    face++
-                }
-
-                if (holdLevel <= 1) break else holdLevel--
+                face++
             }
 
             val suspenseDenominator = (maxFaces + 1) - face
