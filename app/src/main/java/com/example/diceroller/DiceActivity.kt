@@ -202,21 +202,23 @@ class DiceActivity : AppCompatActivity() {
     }
 
     private fun buzz(durationMs: Long) {
-        var prolonged_duration = durationMs * 100
+        val duration = durationMs.coerceAtLeast(16L)
+
+        toneGenerator?.stopTone()
         toneGenerator?.startTone(
             ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,
-            prolonged_duration.toInt()
+            duration.toInt()
         )
 
         if (!vibrator.hasVibrator()) return
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(
-                VibrationEffect.createOneShot(prolonged_duration, VibrationEffect.DEFAULT_AMPLITUDE)
+                VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE)
             )
         } else {
             @Suppress("DEPRECATION")
-            vibrator.vibrate(prolonged_duration)
+            vibrator.vibrate(duration)
         }
     }
 }
