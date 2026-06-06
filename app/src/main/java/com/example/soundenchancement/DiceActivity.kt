@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.*
 import kotlin.random.Random
+import kotlin.coroutines.coroutineContext
 
 class DiceActivity : AppCompatActivity() {
 
@@ -99,7 +100,7 @@ class DiceActivity : AppCompatActivity() {
         tvHint.text = "Hold to roll"
         tvHint.visibility = View.VISIBLE
         var bright = true
-        while (isActive) {
+        while (currentCoroutineContext().isActive) {
             segmentView.showRaw(if (bright) 0x7F else 0x00)
             delay(500)
             bright = !bright
@@ -112,7 +113,7 @@ class DiceActivity : AppCompatActivity() {
         segmentView.clear()
         tvHint.text = "Release!"
         var l = 0
-        while (isActive) {
+        while (currentCoroutineContext().isActive) {
             buzz(1L)
             l++
             val waitMs = (500.0 / l + 15).toLong().coerceAtLeast(16L)
