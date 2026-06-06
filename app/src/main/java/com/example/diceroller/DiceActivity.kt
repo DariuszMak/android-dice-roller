@@ -153,7 +153,7 @@ class DiceActivity : AppCompatActivity() {
                 }
             }
 
-            // ✅ NEW: deterministic roll trigger
+            
             if (rollRequested) {
                 rollRequested = false
                 buttonCaught = true

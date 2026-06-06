@@ -6,7 +6,7 @@ import org.junit.Test
 
 class DiceRollLogicTest {
 
-    // AVR: i *= t+l — seed multiplication
+    
     @Test
     fun seedMultiplication_nonZeroResult() {
         var i = 1
@@ -22,7 +22,7 @@ class DiceRollLogicTest {
         val t = 0
         val l = 0
         i *= (t + l)
-        // guard: i==0 → 1
+        
         if (i == 0) i = 1
         assertEquals(1, i)
     }
@@ -36,7 +36,7 @@ class DiceRollLogicTest {
         }
     }
 
-    // AVR: for(i;i>=1;i-=1) { n=rand()%6+1 } — runs outerI times, final n is last roll
+    
     @Test
     fun outerLoop_runsExactCount() {
         val outerI = 5
@@ -50,7 +50,7 @@ class DiceRollLogicTest {
         assertTrue(n in 1..6)
     }
 
-    // AVR: _delay_ms((2+1500/l)/(7-i)) — delay formula
+    
     @Test
     fun delayFormula_decreasesAsFaceIncreases() {
         val l = 10
@@ -75,7 +75,7 @@ class DiceRollLogicTest {
         }
     }
 
-    // AVR: hold delay = 500/l + 15  (integer division, decreases as l grows)
+    
     @Test
     fun holdDelay_decreasesWithL() {
         val prev = (500 / 1 + 15).toLong()
@@ -89,7 +89,7 @@ class DiceRollLogicTest {
         assertEquals(16L, d.coerceAtLeast(16L))
     }
 
-    // AVR: startup animation — 7 steps, buzz duration == step index
+    
     @Test
     fun startupAnimation_sevenSteps() {
         val steps = mutableListOf<Pair<Int, Int>>()
@@ -110,7 +110,7 @@ class DiceRollLogicTest {
         assertEquals(7, segSequence.toSet().size)
     }
 
-    // AVR: l counts up to 255 max
+    
     @Test
     fun holdCount_clampsAt255() {
         var l = 0
@@ -121,7 +121,7 @@ class DiceRollLogicTest {
         assertEquals(255, l)
     }
 
-    // AVR: l decrements until l==1 then breaks outer roll loop
+    
     @Test
     fun rollLoop_lDecrementsToOne() {
         var l = 5
