@@ -99,6 +99,17 @@ class DiceActivity : AppCompatActivity() {
         }
     }
 
+    private fun resetButtonState() {
+        buttonPressed = false
+        rollRequested = false
+        val bg = btnRoll.background
+        btnRoll.background = null
+        btnRoll.background = bg
+        btnRoll.isPressed = false
+        btnRoll.isEnabled = false
+        btnRoll.refreshDrawableState()
+    }
+
     private suspend fun mainLoop() {
         val maxFaces = 6
 
@@ -152,6 +163,7 @@ class DiceActivity : AppCompatActivity() {
             val seed = (t + holdLevel).coerceAtLeast(1)
             i = ((i.toLong() * seed) % 20 + 1).toInt()
 
+            resetButtonState()
             tvHint.text = ""
 
             var outerI = i
@@ -198,13 +210,16 @@ class DiceActivity : AppCompatActivity() {
 
             segmentView.showDp = false
 
+            btnRoll.clearFocus()
+            btnRoll.isPressed = false
+            btnRoll.isEnabled = true
             tvHint.text = "Hold to roll again"
             tvHint.visibility = View.VISIBLE
         }
     }
 
     private fun buzz(durationMs: Long) {
-        var prolonged_duration = durationMs * 100
+        val prolonged_duration = durationMs * 100
 
         toneGenerator?.stopTone()
         toneGenerator?.startTone(
