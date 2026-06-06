@@ -13,11 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Diceroller">
 
-        <service
-            android:name=".AudioEffectService"
-            android:exported="false"
-            android:foregroundServiceType="mediaPlayback" />
-
         <activity
             android:name=".DiceActivity"
             android:exported="true"
