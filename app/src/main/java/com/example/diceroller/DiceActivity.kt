@@ -147,6 +147,8 @@ class DiceActivity : AppCompatActivity() {
 
             if (!buttonCaught) continue
 
+            holdLevel = holdLevel.coerceAtLeast(1)
+
             val seed = (t + holdLevel).coerceAtLeast(1)
             i = ((i.toLong() * seed) % 20 + 1).toInt()
 
