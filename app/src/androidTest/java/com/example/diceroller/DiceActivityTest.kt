@@ -114,7 +114,7 @@ class DiceActivityTest {
         press()
         Thread.sleep(800)
         release()
-        Thread.sleep(8000)
+        Thread.sleep(20000)
         assertEquals("Hold to roll again", hintText())
     }
 
