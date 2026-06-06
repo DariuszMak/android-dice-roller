@@ -152,6 +152,8 @@ class DiceActivity : AppCompatActivity() {
 
             tvHint.text = ""
 
+            val safeHoldLevel = holdLevel.coerceAtLeast(1)
+
             var outerI = i
             var n = 0
             var face = 1
@@ -166,8 +168,8 @@ class DiceActivity : AppCompatActivity() {
                 while (face <= n) {
                     val denominator = (maxFaces + 1) - face
                     val delayMs = if (denominator > 0) {
-                        ((2 + 1500 / holdLevel) / denominator).toLong().coerceAtLeast(40L)  // was 16L
-                    } else 40L
+                        ((2 + 1500 / safeHoldLevel) / denominator).toLong().coerceAtLeast(16L)
+                    } else 16L
 
                     delay(delayMs)
                     segmentView.showDigit(face)
@@ -176,14 +178,14 @@ class DiceActivity : AppCompatActivity() {
                     face++
                 }
 
-                if (holdLevel == 1) break else holdLevel--
+                if (safeHoldLevel == 1) break else holdLevel--
             }
 
             val suspenseDenominator = (maxFaces + 1) - face
 
             if (suspenseDenominator > 0) {
                 val suspenseDelayMs =
-                    ((2 + 1500 / holdLevel) / suspenseDenominator).toLong().coerceAtLeast(16L)
+                    ((2 + 1500 / safeHoldLevel) / suspenseDenominator).toLong().coerceAtLeast(16L)
                 delay(suspenseDelayMs)
             }
 
