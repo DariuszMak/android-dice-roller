@@ -10,7 +10,6 @@ import androidx.test.filters.LargeTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,121 +32,117 @@ class DiceActivityTest {
 
     private fun waitForStartup() = Thread.sleep(3500)
 
-    private fun view(id: Int, block: (View) -> Unit) {
-        scenario.onActivity { activity -> block(activity.findViewById(id)) }
+    private fun press() {
+        scenario.onActivity { activity ->
+            val btn = activity.findViewById<Button>(R.id.btnRoll)
+            val now = android.os.SystemClock.uptimeMillis()
+            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 0f, 0f, 0))
+        }
+    }
+
+    private fun release() {
+        scenario.onActivity { activity ->
+            val btn = activity.findViewById<Button>(R.id.btnRoll)
+            val now = android.os.SystemClock.uptimeMillis()
+            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 0f, 0f, 0))
+        }
+    }
+
+    private fun hintText(): String {
+        var text = ""
+        scenario.onActivity { activity ->
+            text = activity.findViewById<TextView>(R.id.tvHint).text.toString()
+        }
+        return text
+    }
+
+    private fun hintVisibility(): Int {
+        var vis = -1
+        scenario.onActivity { activity ->
+            vis = activity.findViewById<TextView>(R.id.tvHint).visibility
+        }
+        return vis
     }
 
     @Test
     fun idleState_hintVisible() {
         waitForStartup()
-        view(R.id.tvHint) { v ->
-            assertEquals(View.VISIBLE, v.visibility)
-            assertEquals("Hold to roll", (v as TextView).text.toString())
-        }
+        assertEquals(View.VISIBLE, hintVisibility())
+        assertEquals("Hold to roll", hintText())
     }
 
     @Test
     fun rollButton_isDisplayed() {
-        view(R.id.btnRoll) { v ->
-            assertEquals(View.VISIBLE, v.visibility)
+        var vis = -1
+        scenario.onActivity { activity ->
+            vis = activity.findViewById<Button>(R.id.btnRoll).visibility
         }
+        assertEquals(View.VISIBLE, vis)
     }
 
     @Test
     fun sevenSegmentView_isDisplayed() {
-        view(R.id.sevenSegment) { v ->
-            assertEquals(View.VISIBLE, v.visibility)
+        var vis = -1
+        scenario.onActivity { activity ->
+            vis = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).visibility
         }
+        assertEquals(View.VISIBLE, vis)
     }
 
     @Test
     fun shortPress_triggersRoll() {
         waitForStartup()
-        scenario.onActivity { activity ->
-            val btn = activity.findViewById<Button>(R.id.btnRoll)
-            val now = android.os.SystemClock.uptimeMillis()
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 0f, 0f, 0))
-            Thread.sleep(100)
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now + 100, MotionEvent.ACTION_UP, 0f, 0f, 0))
-        }
-        Thread.sleep(6000)
-        view(R.id.tvHint) { v ->
-            assertEquals("Hold to roll again", (v as TextView).text.toString())
-        }
+        press()
+        Thread.sleep(200)
+        release()
+        Thread.sleep(8000)
+        assertEquals("Hold to roll again", hintText())
     }
 
     @Test
     fun longPress_showsReleaseHint() {
         waitForStartup()
-        scenario.onActivity { activity ->
-            val btn = activity.findViewById<Button>(R.id.btnRoll)
-            val now = android.os.SystemClock.uptimeMillis()
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 0f, 0f, 0))
-        }
+        press()
         Thread.sleep(400)
-        view(R.id.tvHint) { v ->
-            assertEquals("Release!", (v as TextView).text.toString())
-        }
-        scenario.onActivity { activity ->
-            val btn = activity.findViewById<Button>(R.id.btnRoll)
-            val now = android.os.SystemClock.uptimeMillis()
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 0f, 0f, 0))
-        }
+        assertEquals("Release!", hintText())
+        release()
     }
 
     @Test
     fun afterRoll_hintUpdatesToRollAgain() {
         waitForStartup()
-        scenario.onActivity { activity ->
-            val btn = activity.findViewById<Button>(R.id.btnRoll)
-            val now = android.os.SystemClock.uptimeMillis()
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 0f, 0f, 0))
-        }
+        press()
         Thread.sleep(800)
-        scenario.onActivity { activity ->
-            val btn = activity.findViewById<Button>(R.id.btnRoll)
-            val now = android.os.SystemClock.uptimeMillis()
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 0f, 0f, 0))
-        }
-        Thread.sleep(6000)
-        view(R.id.tvHint) { v ->
-            assertEquals("Hold to roll again", (v as TextView).text.toString())
-        }
+        release()
+        Thread.sleep(8000)
+        assertEquals("Hold to roll again", hintText())
     }
 
     @Test
     fun sevenSegmentView_remainsVisibleDuringRoll() {
         waitForStartup()
-        scenario.onActivity { activity ->
-            val btn = activity.findViewById<Button>(R.id.btnRoll)
-            val now = android.os.SystemClock.uptimeMillis()
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 0f, 0f, 0))
-            Thread.sleep(100)
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now + 100, MotionEvent.ACTION_UP, 0f, 0f, 0))
-        }
+        press()
+        Thread.sleep(200)
+        release()
         Thread.sleep(1000)
-        view(R.id.sevenSegment) { v ->
-            assertEquals(View.VISIBLE, v.visibility)
+        var vis = -1
+        scenario.onActivity { activity ->
+            vis = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).visibility
         }
+        assertEquals(View.VISIBLE, vis)
     }
 
     @Test
     fun afterRoll_segmentShowsResult() {
         waitForStartup()
-        scenario.onActivity { activity ->
-            val btn = activity.findViewById<Button>(R.id.btnRoll)
-            val now = android.os.SystemClock.uptimeMillis()
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 0f, 0f, 0))
-        }
+        press()
         Thread.sleep(500)
+        release()
+        Thread.sleep(8000)
+        var bits = -1
         scenario.onActivity { activity ->
-            val btn = activity.findViewById<Button>(R.id.btnRoll)
-            val now = android.os.SystemClock.uptimeMillis()
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 0f, 0f, 0))
+            bits = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).getCurrentBits()
         }
-        Thread.sleep(6000)
-        view(R.id.sevenSegment) { v ->
-            assertNotEquals(0, (v as SevenSegmentView).getCurrentBits())
-        }
+        assertNotEquals(0, bits)
     }
 }
