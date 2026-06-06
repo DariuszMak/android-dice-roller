@@ -30,19 +30,23 @@ class SevenSegmentView @JvmOverloads constructor(
         color = Color.parseColor("#FF4400")
         style = Paint.Style.FILL
     }
+
     private val paintOff = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#1A0800")
         style = Paint.Style.FILL
     }
+
     private val paintGlow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#33FF4400")
         style = Paint.Style.FILL
     }
 
     private var segmentBits: Int = 0
+
     var showDp: Boolean = false
         set(value) {
-            field = value; invalidate()
+            field = value
+            invalidate()
         }
 
     fun getCurrentBits(): Int = segmentBits
@@ -64,65 +68,92 @@ class SevenSegmentView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
         val w = width.toFloat()
         val h = height.toFloat()
 
-        val thickness = w * 0.10f
-        val gap = thickness * 0.15f
-        val hLen = w * 0.60f
-        val vLen = h * 0.42f
-        val cx = w / 2f
+        val thickness = w * 0.12f
+        val pad = thickness * 0.35f
+
+        val left = pad
+        val right = w - pad
+        val top = pad
+        val bottom = h - pad
+
+        val midX = (left + right) / 2f
+        val midY = (top + bottom) / 2f
+
+        val segLenH = right - left
+        val segLenV = midY - top
 
         fun segOn(bit: Int) = (segmentBits and (1 shl bit)) != 0
 
-        fun drawH(canvas: Canvas, cx: Float, cy: Float, on: Boolean) {
-            val paint = if (on) paintOn else paintOff
-            val gx = gap * 1.5f
-            val left = cx - hLen / 2 + gx
-            val right = cx + hLen / 2 - gx
-            val top = cy - thickness / 2
-            val bot = cy + thickness / 2
-            val r = thickness / 2
-            canvas.drawRoundRect(
-                RectF(left, top, right, bot), r, r,
-                if (on) paintGlow.apply { this.color = 0x22FF4400.toInt() } else paintOff
+        fun drawH(x1: Float, x2: Float, y: Float, on: Boolean) {
+            val paintFill = if (on) paintOn else paintOff
+            val glow = if (on) paintGlow else paintOff
+
+            val rect = RectF(
+                x1,
+                y - thickness / 2,
+                x2,
+                y + thickness / 2
             )
-            canvas.drawRoundRect(RectF(left + 1, top + 1, right - 1, bot - 1), r, r, paint)
+
+            canvas.drawRoundRect(rect, thickness / 2, thickness / 2, glow)
+            canvas.drawRoundRect(
+                RectF(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2),
+                thickness / 2,
+                thickness / 2,
+                paintFill
+            )
         }
 
-        fun drawV(canvas: Canvas, x: Float, topY: Float, on: Boolean) {
-            val paint = if (on) paintOn else paintOff
-            val gy = gap * 1.5f
-            val left = x - thickness / 2
-            val right = x + thickness / 2
-            val top = topY + gy
-            val bot = topY + vLen - gy
-            val r = thickness / 2
-            canvas.drawRoundRect(
-                RectF(left, top, right, bot), r, r,
-                if (on) paintGlow.apply { this.color = 0x22FF4400.toInt() } else paintOff
+        fun drawV(x: Float, y1: Float, y2: Float, on: Boolean) {
+            val paintFill = if (on) paintOn else paintOff
+            val glow = if (on) paintGlow else paintOff
+
+            val rect = RectF(
+                x - thickness / 2,
+                y1,
+                x + thickness / 2,
+                y2
             )
-            canvas.drawRoundRect(RectF(left + 1, top + 1, right - 1, bot - 1), r, r, paint)
+
+            canvas.drawRoundRect(rect, thickness / 2, thickness / 2, glow)
+            canvas.drawRoundRect(
+                RectF(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2),
+                thickness / 2,
+                thickness / 2,
+                paintFill
+            )
         }
 
-        val topY = h * 0.04f
-        val midY = h / 2f
-        val botY = h * 0.96f - thickness
-        val leftX = cx - hLen / 2
-        val rightX = cx + hLen / 2
+        // Segment layout (standard 7-seg)
+        // A (top)
+        drawH(left, right, top, segOn(0))
 
-        drawH(canvas, cx, topY + thickness / 2, segOn(0))
-        drawV(canvas, rightX - thickness / 2, topY, segOn(1))
-        drawV(canvas, rightX - thickness / 2, midY, segOn(2))
-        drawH(canvas, cx, botY + thickness / 2, segOn(3))
-        drawV(canvas, leftX + thickness / 2, midY, segOn(4))
-        drawV(canvas, leftX + thickness / 2, topY, segOn(5))
-        drawH(canvas, cx, midY + thickness / 2, segOn(6))
+        // B (top-right)
+        drawV(right, top, midY, segOn(1))
 
-        val dpR = thickness * 0.55f
-        val dpX = rightX + dpR * 1.2f
-        val dpY = botY + thickness / 2
-        val dpPaint = if (showDp) paintOn else paintOff
-        canvas.drawCircle(dpX, dpY, dpR, dpPaint)
+        // C (bottom-right)
+        drawV(right, midY, bottom, segOn(2))
+
+        // D (bottom)
+        drawH(left, right, bottom, segOn(3))
+
+        // E (bottom-left)
+        drawV(left, midY, bottom, segOn(4))
+
+        // F (top-left)
+        drawV(left, top, midY, segOn(5))
+
+        // G (middle)
+        drawH(left, right, midY, segOn(6))
+
+        // Decimal point
+        val dpRadius = thickness * 0.45f
+        val dpX = right + dpRadius * 1.4f
+        val dpY = bottom
+        canvas.drawCircle(dpX, dpY, dpRadius, if (showDp) paintOn else paintOff)
     }
 }
