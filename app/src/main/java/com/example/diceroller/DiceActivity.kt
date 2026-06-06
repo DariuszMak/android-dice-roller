@@ -1,7 +1,6 @@
 package com.example.diceroller
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Build
@@ -51,10 +50,10 @@ class DiceActivity : AppCompatActivity() {
         tvHint = findViewById(R.id.tvHint)
 
         vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+            (getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
         } else {
             @Suppress("DEPRECATION")
-            getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            getSystemService(VIBRATOR_SERVICE) as Vibrator
         }
 
         toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME)
@@ -191,7 +190,10 @@ class DiceActivity : AppCompatActivity() {
 
     private fun buzz(durationMs: Long) {
         var prolonged_duration = durationMs * 100
-        toneGenerator?.startTone(ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE, prolonged_duration.toInt())
+        toneGenerator?.startTone(
+            ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,
+            prolonged_duration.toInt()
+        )
 
         if (!vibrator.hasVibrator()) return
 
