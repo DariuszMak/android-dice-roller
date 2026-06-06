@@ -2,6 +2,8 @@ package com.example.diceroller
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
@@ -37,6 +39,7 @@ class DiceActivity : AppCompatActivity() {
     private var rollRequested = false
 
     private lateinit var vibrator: Vibrator
+    private var toneGenerator: ToneGenerator? = null
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,12 +50,16 @@ class DiceActivity : AppCompatActivity() {
         btnRoll = findViewById(R.id.btnRoll)
         tvHint = findViewById(R.id.tvHint)
 
+        // Initialize Vibrator
         vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
         } else {
             @Suppress("DEPRECATION")
             getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }
+
+        // Initialize ToneGenerator for speaker sounds
+        toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME)
 
         btnRoll.setOnTouchListener { _, event ->
             when (event.actionMasked) {
@@ -82,6 +89,9 @@ class DiceActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         activityScope.cancel()
+        // Release the ToneGenerator to free up audio resources
+        toneGenerator?.release()
+        toneGenerator = null
     }
 
     private suspend fun startupAnimation() {
@@ -101,7 +111,6 @@ class DiceActivity : AppCompatActivity() {
             tvHint.visibility = View.VISIBLE
 
             var t = 0
-            var d = 1
             var buttonCaught = false
             var holdLevel = 0
 
@@ -131,27 +140,10 @@ class DiceActivity : AppCompatActivity() {
                     break@tLoop
                 }
 
-                val w = segmentView.getCurrentBits()
-
-                if (d == 1) {
-                    segmentView.showRaw(0x7F)
-                } else {
-                    segmentView.showRaw(w)
-                }
-
-                delay(1)
-
-                if (d == 1) {
-                    segmentView.showRaw(w)
-                } else {
-                    segmentView.showRaw(0x7F)
-                }
-
-                delay(1)
-
-                if (t == 750) {
-                    d = if (d == 1) 0 else 1
-                }
+                // Replacing the manual 0x7F / delay(1) toggling to fix the flicker.
+                // A simple delay(2) keeps your total loop time and randomness seed intact
+                // without refreshing the screen unnecessarily.
+                delay(2)
             }
 
 
@@ -205,6 +197,11 @@ class DiceActivity : AppCompatActivity() {
     }
 
     private fun buzz(durationMs: Long) {
+        // 1. Play Sound
+        // TONE_CDMA_PRESS_CLICK or TONE_PROP_BEEP are good options for quick "ticks/buzzes"
+        toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP, durationMs.toInt())
+
+        // 2. Play Haptic Vibration
         if (!vibrator.hasVibrator()) return
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
