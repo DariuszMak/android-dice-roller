@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.RectF
+import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
 
@@ -24,14 +24,19 @@ class SevenSegmentView @JvmOverloads constructor(
     }
 
     private val paintOff = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#140600")
+        color = Color.parseColor("#3A0F00")
         style = Paint.Style.FILL
     }
 
+
     private val paintGlow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#22FF4400")
-        style = Paint.Style.FILL
+        color = Color.parseColor("#33FF4400")
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.ROUND
     }
+
+
+    private val segmentPath = Path()
 
     private var segmentBits: Int = 0
 
@@ -64,7 +69,6 @@ class SevenSegmentView @JvmOverloads constructor(
         val w = width.toFloat()
         val h = height.toFloat()
 
-        
         val widthScale = 0.72f
         val heightScale = 0.90f
 
@@ -74,66 +78,74 @@ class SevenSegmentView @JvmOverloads constructor(
         val offsetX = (w - dw) / 2f
         val offsetY = (h - dh) / 2f
 
-        
-        val t = dw * 0.12f
 
-        
-        val gap = t * 0.35f
+        val t = dw * 0.14f
 
-        val left = offsetX + gap
-        val right = offsetX + dw - gap
-        val top = offsetY + gap
-        val bottom = offsetY + dh - gap
 
-        val midX = (left + right) / 2f
+        paintGlow.strokeWidth = t * 0.25f
+
+
+        val gap = t * 0.08f
+
+
+        val left = offsetX + t / 2f
+        val right = offsetX + dw - t / 2f
+        val top = offsetY + t / 2f
+        val bottom = offsetY + dh - t / 2f
         val midY = (top + bottom) / 2f
 
         fun drawH(x1: Float, x2: Float, y: Float, on: Boolean) {
-            val fill = if (on) paintOn else paintOff
-            val glow = if (on) paintGlow else paintOff
+            segmentPath.reset()
+            segmentPath.moveTo(x1 + gap, y)
+            segmentPath.lineTo(x1 + gap + t / 2, y - t / 2)
+            segmentPath.lineTo(x2 - gap - t / 2, y - t / 2)
+            segmentPath.lineTo(x2 - gap, y)
+            segmentPath.lineTo(x2 - gap - t / 2, y + t / 2)
+            segmentPath.lineTo(x1 + gap + t / 2, y + t / 2)
+            segmentPath.close()
 
-            val r = RectF(x1, y - t / 2, x2, y + t / 2)
-
-            canvas.drawRoundRect(r, t / 2, t / 2, glow)
-            canvas.drawRoundRect(
-                RectF(r.left + 2, r.top + 2, r.right - 2, r.bottom - 2),
-                t / 2,
-                t / 2,
-                fill
-            )
+            if (on) {
+                canvas.drawPath(segmentPath, paintGlow)
+                canvas.drawPath(segmentPath, paintOn)
+            } else {
+                canvas.drawPath(segmentPath, paintOff)
+            }
         }
 
         fun drawV(x: Float, y1: Float, y2: Float, on: Boolean) {
-            val fill = if (on) paintOn else paintOff
-            val glow = if (on) paintGlow else paintOff
+            segmentPath.reset()
+            segmentPath.moveTo(x, y1 + gap)
+            segmentPath.lineTo(x + t / 2, y1 + gap + t / 2)
+            segmentPath.lineTo(x + t / 2, y2 - gap - t / 2)
+            segmentPath.lineTo(x, y2 - gap)
+            segmentPath.lineTo(x - t / 2, y2 - gap - t / 2)
+            segmentPath.lineTo(x - t / 2, y1 + gap + t / 2)
+            segmentPath.close()
 
-            val r = RectF(x - t / 2, y1, x + t / 2, y2)
-
-            canvas.drawRoundRect(r, t / 2, t / 2, glow)
-            canvas.drawRoundRect(
-                RectF(r.left + 2, r.top + 2, r.right - 2, r.bottom - 2),
-                t / 2,
-                t / 2,
-                fill
-            )
+            if (on) {
+                canvas.drawPath(segmentPath, paintGlow)
+                canvas.drawPath(segmentPath, paintOn)
+            } else {
+                canvas.drawPath(segmentPath, paintOff)
+            }
         }
 
-        // A
+        // A (Top)
         drawH(left, right, top, isOn(0))
-        // B
+        // B (Top Right)
         drawV(right, top, midY, isOn(1))
-        // C
+        // C (Bottom Right)
         drawV(right, midY, bottom, isOn(2))
-        // D
+        // D (Bottom)
         drawH(left, right, bottom, isOn(3))
-        // E
+        // E (Bottom Left)
         drawV(left, midY, bottom, isOn(4))
-        // F
+        // F (Top Left)
         drawV(left, top, midY, isOn(5))
-        // G
+        // G (Middle)
         drawH(left, right, midY, isOn(6))
 
-        
+        // Decimal Point
         val dpR = t * 0.45f
         val dpX = right + dpR * 1.6f
         val dpY = bottom
