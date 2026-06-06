@@ -205,6 +205,8 @@ class DiceActivity : AppCompatActivity() {
 
     private fun buzz(durationMs: Long) {
         var prolonged_duration = durationMs * 100
+        
+        toneGenerator?.stopTone()
         toneGenerator?.startTone(
             ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,
             prolonged_duration.toInt()
