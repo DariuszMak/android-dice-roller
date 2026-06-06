@@ -56,18 +56,23 @@ class DiceActivityTest {
         return text
     }
 
-    private fun hintVisibility(): Int {
-        var vis = -1
-        scenario.onActivity { activity ->
-            vis = activity.findViewById<TextView>(R.id.tvHint).visibility
+    private fun waitForHint(expected: String, timeoutMs: Long = 30000) {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            if (hintText() == expected) return
+            Thread.sleep(200)
         }
-        return vis
+        assertEquals(expected, hintText())
     }
 
     @Test
     fun idleState_hintVisible() {
         waitForStartup()
-        assertEquals(View.VISIBLE, hintVisibility())
+        var vis = -1
+        scenario.onActivity { activity ->
+            vis = activity.findViewById<TextView>(R.id.tvHint).visibility
+        }
+        assertEquals(View.VISIBLE, vis)
         assertEquals("Hold to roll", hintText())
     }
 
@@ -95,8 +100,7 @@ class DiceActivityTest {
         press()
         Thread.sleep(200)
         release()
-        Thread.sleep(8000)
-        assertEquals("Hold to roll again", hintText())
+        waitForHint("Hold to roll again")
     }
 
     @Test
@@ -114,8 +118,7 @@ class DiceActivityTest {
         press()
         Thread.sleep(800)
         release()
-        Thread.sleep(20000)
-        assertEquals("Hold to roll again", hintText())
+        waitForHint("Hold to roll again")
     }
 
     @Test
@@ -138,7 +141,7 @@ class DiceActivityTest {
         press()
         Thread.sleep(500)
         release()
-        Thread.sleep(8000)
+        waitForHint("Hold to roll again")
         var bits = -1
         scenario.onActivity { activity ->
             bits = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).getCurrentBits()
