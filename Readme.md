@@ -1,4 +1,4 @@
-# Global sound equalizer Android app
+# Dice roller app
 
 ### Release file:
 
