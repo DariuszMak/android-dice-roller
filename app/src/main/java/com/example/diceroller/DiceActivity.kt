@@ -178,7 +178,7 @@ class DiceActivity : AppCompatActivity() {
                     face++
                 }
 
-                if (safeHoldLevel == 1) break else holdLevel--
+                if (holdLevel <= 1) break else holdLevel--
             }
 
             val suspenseDenominator = (maxFaces + 1) - face
