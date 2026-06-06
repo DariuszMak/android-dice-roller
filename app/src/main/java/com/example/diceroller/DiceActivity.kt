@@ -100,6 +100,8 @@ class DiceActivity : AppCompatActivity() {
     }
 
     private suspend fun mainLoop() {
+        val maxFaces = 6
+
         var i = 1
 
         while (currentCoroutineContext().isActive) {
@@ -138,7 +140,6 @@ class DiceActivity : AppCompatActivity() {
                 delay(2)
             }
 
-
             if (rollRequested) {
                 rollRequested = false
                 buttonCaught = true
@@ -153,25 +154,37 @@ class DiceActivity : AppCompatActivity() {
 
             var outerI = i
             var n = 0
+            var face = 1
 
             while (currentCoroutineContext().isActive) {
 
                 for (k in outerI downTo 1) {
-                    n = Random.nextInt(1, 7)
+                    n = Random.nextInt(1, maxFaces + 1)
                 }
 
-                for (face in 1..n) {
-                    val delayMs =
-                        if ((7 - face) > 0) {
-                            ((2 + 1500 / holdLevel) / (7 - face)).toLong().coerceAtLeast(16L)
-                        } else 16L
+                face = 1
+                while (face <= n) {
+                    val denominator = (maxFaces + 1) - face
+                    val delayMs = if (denominator > 0) {
+                        ((2 + 1500 / holdLevel) / denominator).toLong().coerceAtLeast(16L)
+                    } else 16L
 
                     delay(delayMs)
                     segmentView.showDigit(face)
                     buzz(1L)
+
+                    face++
                 }
 
                 if (holdLevel == 1) break else holdLevel--
+            }
+
+            val suspenseDenominator = (maxFaces + 1) - face
+
+            if (suspenseDenominator > 0) {
+                val suspenseDelayMs =
+                    ((2 + 1500 / holdLevel) / suspenseDenominator).toLong().coerceAtLeast(16L)
+                delay(suspenseDelayMs)
             }
 
             delay(30L)
