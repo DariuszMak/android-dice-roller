@@ -190,17 +190,18 @@ class DiceActivity : AppCompatActivity() {
     }
 
     private fun buzz(durationMs: Long) {
-        toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP, durationMs.toInt())
+        var prolonged_duration = durationMs * 100
+        toneGenerator?.startTone(ToneGenerator.TONE_SUP_BUSY, prolonged_duration.toInt())
 
         if (!vibrator.hasVibrator()) return
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(
-                VibrationEffect.createOneShot(durationMs, VibrationEffect.DEFAULT_AMPLITUDE)
+                VibrationEffect.createOneShot(prolonged_duration, VibrationEffect.DEFAULT_AMPLITUDE)
             )
         } else {
             @Suppress("DEPRECATION")
-            vibrator.vibrate(durationMs)
+            vibrator.vibrate(prolonged_duration)
         }
     }
 }
