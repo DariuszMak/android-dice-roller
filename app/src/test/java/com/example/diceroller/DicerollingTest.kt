@@ -67,8 +67,9 @@ class DiceRollLogicTest {
     fun delayFormula_neverNegative() {
         for (l in 1..255) {
             for (face in 1..6) {
-                val d = if ((7 - face) > 0) ((2 + 1500 / l) / (7 - face)).toLong().coerceAtLeast(16L)
-                        else 30L
+                val d =
+                    if ((7 - face) > 0) ((2 + 1500 / l) / (7 - face)).toLong().coerceAtLeast(16L)
+                    else 30L
                 assertTrue(d >= 0)
             }
         }

@@ -12,7 +12,14 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class DiceActivity : AppCompatActivity() {
@@ -23,8 +30,10 @@ class DiceActivity : AppCompatActivity() {
 
     private val activityScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    @Volatile private var buttonPressed = false
-    @Volatile private var rollRequested = false
+    @Volatile
+    private var buttonPressed = false
+    @Volatile
+    private var rollRequested = false
 
     private lateinit var vibrator: Vibrator
 
