@@ -6,7 +6,7 @@ import org.junit.Test
 
 class DiceRollLogicTest {
 
-    
+
     @Test
     fun seedMultiplication_nonZeroResult() {
         var i = 1
@@ -22,7 +22,7 @@ class DiceRollLogicTest {
         val t = 0
         val l = 0
         i *= (t + l)
-        
+
         if (i == 0) i = 1
         assertEquals(1, i)
     }
@@ -36,7 +36,7 @@ class DiceRollLogicTest {
         }
     }
 
-    
+
     @Test
     fun outerLoop_runsExactCount() {
         val outerI = 5
@@ -50,7 +50,7 @@ class DiceRollLogicTest {
         assertTrue(n in 1..6)
     }
 
-    
+
     @Test
     fun delayFormula_decreasesAsFaceIncreases() {
         val l = 10
@@ -75,7 +75,7 @@ class DiceRollLogicTest {
         }
     }
 
-    
+
     @Test
     fun holdDelay_decreasesWithL() {
         val prev = (500 / 1 + 15).toLong()
@@ -89,7 +89,7 @@ class DiceRollLogicTest {
         assertEquals(16L, d.coerceAtLeast(16L))
     }
 
-    
+
     @Test
     fun startupAnimation_sevenSteps() {
         val steps = mutableListOf<Pair<Int, Int>>()
@@ -110,7 +110,7 @@ class DiceRollLogicTest {
         assertEquals(7, segSequence.toSet().size)
     }
 
-    
+
     @Test
     fun holdCount_clampsAt255() {
         var l = 0
@@ -121,7 +121,7 @@ class DiceRollLogicTest {
         assertEquals(255, l)
     }
 
-    
+
     @Test
     fun rollLoop_lDecrementsToOne() {
         var l = 5

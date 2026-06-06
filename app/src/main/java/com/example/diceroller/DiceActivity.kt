@@ -32,6 +32,7 @@ class DiceActivity : AppCompatActivity() {
 
     @Volatile
     private var buttonPressed = false
+
     @Volatile
     private var rollRequested = false
 
@@ -153,7 +154,7 @@ class DiceActivity : AppCompatActivity() {
                 }
             }
 
-            
+
             if (rollRequested) {
                 rollRequested = false
                 buttonCaught = true
