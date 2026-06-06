@@ -44,7 +44,9 @@ class SevenSegmentView @JvmOverloads constructor(
 
     private var segmentBits: Int = 0
     var showDp: Boolean = false
-        set(value) { field = value; invalidate() }
+        set(value) {
+            field = value; invalidate()
+        }
 
     fun showDigit(n: Int) {
         segmentBits = if (n in 0..9) DIGIT_SEGMENTS[n] else 0
@@ -83,7 +85,11 @@ class SevenSegmentView @JvmOverloads constructor(
             val top = cy - thickness / 2
             val bot = cy + thickness / 2
             val r = thickness / 2
-            canvas.drawRoundRect(RectF(left, top, right, bot), r, r, if (on) paintGlow.apply { this.color = 0x22FF4400.toInt() } else paintOff)
+            canvas.drawRoundRect(
+                RectF(left, top, right, bot),
+                r,
+                r,
+                if (on) paintGlow.apply { this.color = 0x22FF4400.toInt() } else paintOff)
             canvas.drawRoundRect(RectF(left + 1, top + 1, right - 1, bot - 1), r, r, paint)
         }
 
@@ -95,7 +101,11 @@ class SevenSegmentView @JvmOverloads constructor(
             val top = topY + gy
             val bot = topY + vLen - gy
             val r = thickness / 2
-            canvas.drawRoundRect(RectF(left, top, right, bot), r, r, if (on) paintGlow.apply { this.color = 0x22FF4400.toInt() } else paintOff)
+            canvas.drawRoundRect(
+                RectF(left, top, right, bot),
+                r,
+                r,
+                if (on) paintGlow.apply { this.color = 0x22FF4400.toInt() } else paintOff)
             canvas.drawRoundRect(RectF(left + 1, top + 1, right - 1, bot - 1), r, r, paint)
         }
 

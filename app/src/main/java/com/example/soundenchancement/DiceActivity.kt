@@ -2,19 +2,25 @@ package com.example.soundenhancement
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.os.Build
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlin.random.Random
-import kotlin.coroutines.coroutineContext
 
 class DiceActivity : AppCompatActivity() {
 
@@ -65,6 +71,7 @@ class DiceActivity : AppCompatActivity() {
                     activityScope.launch { runButtonHold() }
                     true
                 }
+
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // Signal release is detected inside runButtonHold via isActive checks
                     // We cancel the hold coroutine and let it finalize
@@ -73,6 +80,7 @@ class DiceActivity : AppCompatActivity() {
                     activityScope.launch { runRollSequence() }
                     true
                 }
+
                 else -> false
             }
         }
@@ -167,7 +175,12 @@ class DiceActivity : AppCompatActivity() {
     private fun buzz(durationMs: Long) {
         if (!vibrator.hasVibrator()) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(durationMs, VibrationEffect.DEFAULT_AMPLITUDE))
+            vibrator.vibrate(
+                VibrationEffect.createOneShot(
+                    durationMs,
+                    VibrationEffect.DEFAULT_AMPLITUDE
+                )
+            )
         } else {
             @Suppress("DEPRECATION")
             vibrator.vibrate(durationMs)
