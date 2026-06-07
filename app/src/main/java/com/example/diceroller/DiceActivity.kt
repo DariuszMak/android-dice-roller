@@ -136,7 +136,7 @@ class DiceActivity : AppCompatActivity() {
                         buzz(1L)
                         holdLevel++
 
-                        val animSeq = intArrayOf(0x40, 0x41, 0x43, 0x47, 0x4F, 0x5F, 0x7F, 0x7F)
+                        val animSeq = intArrayOf(0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0x7F)
 
                         val maxHoldLevel = 63
                         val segmentIndex =
