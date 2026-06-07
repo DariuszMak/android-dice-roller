@@ -136,6 +136,11 @@ class DiceActivity : AppCompatActivity() {
                         buzz(1L)
                         holdLevel++
 
+                        if (holdLevel >= 56) {
+                            val animSeq = intArrayOf(0x40, 0x41, 0x43, 0x47, 0x4F, 0x5F, 0x7F, 0x7F)
+                            segmentView.showRaw(animSeq[holdLevel - 56])
+                        }
+
                         val holdDelay = (500 / holdLevel + 15).toLong().coerceAtLeast(16L)
                         val deadline = System.currentTimeMillis() + holdDelay
 
