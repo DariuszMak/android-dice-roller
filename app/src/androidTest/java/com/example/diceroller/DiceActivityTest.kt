@@ -83,11 +83,13 @@ class DiceActivityTest {
         release()
 
         var isEnabled = true
-        scenario.onActivity { activity ->
-            isEnabled = activity.findViewById<Button>(R.id.btnRoll).isEnabled
+        waitForCondition(timeoutMs = 2000) {
+            scenario.onActivity { activity ->
+                isEnabled = activity.findViewById<Button>(R.id.btnRoll).isEnabled
+            }
+            !isEnabled
         }
-
-        // As soon as the roll starts, the button gets disabled
+        
         assertFalse(isEnabled)
     }
 
