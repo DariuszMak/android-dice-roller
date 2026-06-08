@@ -89,7 +89,7 @@ class DiceActivityTest {
             }
             !isEnabled
         }
-        
+
         assertFalse(isEnabled)
     }
 
