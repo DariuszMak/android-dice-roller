@@ -32,7 +32,7 @@ class DiceActivityTest {
         scenario.close()
     }
 
-    // Helper to dynamically wait for states instead of hardcoded Thread.sleep
+    
     private fun waitForCondition(timeoutMs: Long = 30000, condition: () -> Boolean) {
         val deadline = System.currentTimeMillis() + timeoutMs
         while (System.currentTimeMillis() < deadline) {
@@ -98,7 +98,7 @@ class DiceActivityTest {
         waitForStartup()
         press()
         Thread.sleep(200)
-        cancelTouch() // Simulating user swiping away off the button bounds
+        cancelTouch() 
 
         waitForCondition { hintText() == "Hold to roll again" }
         assertEquals("Hold to roll again", hintText())
@@ -108,13 +108,13 @@ class DiceActivityTest {
     fun multipleRolls_executeSuccessfully() {
         waitForStartup()
 
-        // First roll
+        
         press()
         Thread.sleep(200)
         release()
         waitForCondition { hintText() == "Hold to roll again" }
 
-        // Second roll
+        
         press()
         Thread.sleep(200)
         release()
@@ -124,7 +124,7 @@ class DiceActivityTest {
         scenario.onActivity { activity ->
             bits = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).getSegmentBits()
         }
-        assertNotEquals(0, bits) // Ensure it displays a result
+        assertNotEquals(0, bits) 
     }
 
     @Test
@@ -134,7 +134,7 @@ class DiceActivityTest {
         Thread.sleep(200)
         release()
 
-        // Wait until it gets close to the end, then monitor DP
+        
         var sawDpTrue = false
         waitForCondition {
             scenario.onActivity { activity ->
@@ -147,7 +147,7 @@ class DiceActivityTest {
 
         assertTrue("Decimal point should have blinked to true during resolution phase", sawDpTrue)
 
-        // At the very end, DP should be disabled
+        
         waitForCondition { hintText() == "Hold to roll again" }
         scenario.onActivity { activity ->
             assertFalse(activity.findViewById<SevenSegmentView>(R.id.sevenSegment).showDp)

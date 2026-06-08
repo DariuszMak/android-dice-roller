@@ -15,7 +15,7 @@ class DiceRollLogicTest {
 
     @Test
     fun calculateHoldDelay_clampsTo16msMinimum() {
-        // High hold level that would push formula below 16
+        
         val extremeHold = DiceLogic.calculateHoldDelay(1000)
         assertEquals(16L, extremeHold)
     }
@@ -25,14 +25,14 @@ class DiceRollLogicTest {
         val animSeqSize = 8
         val maxHoldLevel = 63
 
-        // Start of hold
+        
         assertEquals(0, DiceLogic.calculateSegmentIndex(1, maxHoldLevel, animSeqSize))
-        // Middle of hold
+        
         val midIndex = DiceLogic.calculateSegmentIndex(32, maxHoldLevel, animSeqSize)
         assertTrue(midIndex in 1..6)
-        // Max hold
+        
         assertEquals(7, DiceLogic.calculateSegmentIndex(63, maxHoldLevel, animSeqSize))
-        // Exceeding bounds clamps to max index
+        
         assertEquals(7, DiceLogic.calculateSegmentIndex(100, maxHoldLevel, animSeqSize))
     }
 
@@ -70,7 +70,7 @@ class DiceRollLogicTest {
     fun calculateFaceDelay_preventsDivideByZeroAndClamps() {
         val holdLevel = 5
         val maxFaces = 6
-        // Face > Max faces makes denominator <= 0
+        
         val overFaceDelay = DiceLogic.calculateFaceDelay(holdLevel, 7, maxFaces)
         assertEquals(16L, overFaceDelay)
     }
