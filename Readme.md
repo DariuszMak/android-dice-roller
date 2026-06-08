@@ -1,4 +1,4 @@
-# Dice roller app
+# Satisfying Digital Dice Roller app
 
 ### Release file:
 
