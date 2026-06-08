@@ -112,17 +112,15 @@ class DiceActivity : AppCompatActivity() {
 
     private suspend fun mainLoop() {
         val maxFaces = 6
-
         var i = 1
 
         while (currentCoroutineContext().isActive) {
-
             tvHint.visibility = View.VISIBLE
 
             var t = 0
             var buttonCaught = false
             var holdLevel = 0
-            var maxHoldLevel = 63
+            val maxHoldLevel = 63
 
             tLoop@ for (tVal in 0..750) {
                 t = tVal
@@ -133,22 +131,16 @@ class DiceActivity : AppCompatActivity() {
                     tvHint.text = "Release!"
                     holdLevel = 0
 
-
                     while (currentCoroutineContext().isActive) {
                         buzz(1L)
                         holdLevel++
 
                         val animSeq = intArrayOf(0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0x7F)
-
-                        val maxHoldLevel = maxHoldLevel
-                        val segmentIndex =
-                            (((holdLevel - 1).toFloat() / (maxHoldLevel - 1)) * animSeq.size)
-                                .toInt()
-                                .coerceIn(0, animSeq.lastIndex)
+                        val segmentIndex = DiceLogic.calculateSegmentIndex(holdLevel, maxHoldLevel, animSeq.size)
 
                         segmentView.showRaw(animSeq[segmentIndex])
 
-                        val holdDelay = (500 / holdLevel + 15).toLong().coerceAtLeast(16L)
+                        val holdDelay = DiceLogic.calculateHoldDelay(holdLevel)
                         val deadline = System.currentTimeMillis() + holdDelay
 
                         while (System.currentTimeMillis() < deadline) {
@@ -172,28 +164,24 @@ class DiceActivity : AppCompatActivity() {
 
             holdLevel = holdLevel.coerceAtLeast(1)
 
-            val seed = (t + holdLevel).coerceAtLeast(1)
-            i = ((i.toLong() * seed) % 20 + 1).toInt()
+            val seed = DiceLogic.calculateSeed(t, holdLevel)
+            i = DiceLogic.calculateNextI(i, seed)
 
             resetButtonState()
             tvHint.text = ""
 
-            var outerI = i
+            val outerI = i
             var n = 0
             var face = 1
 
             while (currentCoroutineContext().isActive) {
-
                 for (k in outerI downTo 1) {
                     n = Random.nextInt(1, maxFaces + 1)
                 }
 
                 face = 1
                 while (face <= n) {
-                    val denominator = (maxFaces + 1) - face
-                    val delayMs = if (denominator > 0) {
-                        ((2 + 1500 / holdLevel) / denominator).toLong().coerceAtLeast(16L)
-                    } else 16L
+                    val delayMs = DiceLogic.calculateFaceDelay(holdLevel, face, maxFaces)
 
                     delay(delayMs)
                     segmentView.showDigit(face)
@@ -205,11 +193,8 @@ class DiceActivity : AppCompatActivity() {
                 if (holdLevel == 1) break else holdLevel--
             }
 
-            val suspenseDenominator = (maxFaces + 1) - face
-
-            if (suspenseDenominator > 0) {
-                val suspenseDelayMs =
-                    ((2 + 1500 / holdLevel) / suspenseDenominator).toLong().coerceAtLeast(16L)
+            val suspenseDelayMs = DiceLogic.calculateFaceDelay(holdLevel, face, maxFaces)
+            if ((maxFaces + 1) - face > 0) {
                 delay(suspenseDelayMs)
             }
 

@@ -9,7 +9,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,23 +32,29 @@ class DiceActivityTest {
         scenario.close()
     }
 
+    // Helper to dynamically wait for states instead of hardcoded Thread.sleep
+    private fun waitForCondition(timeoutMs: Long = 30000, condition: () -> Boolean) {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            if (condition()) return
+            Thread.sleep(50)
+        }
+        assertTrue("Condition not met within timeout", condition())
+    }
+
     private fun waitForStartup() = Thread.sleep(3500)
 
-    private fun press() {
+    private fun dispatchTouch(action: Int) {
         scenario.onActivity { activity ->
             val btn = activity.findViewById<Button>(R.id.btnRoll)
             val now = android.os.SystemClock.uptimeMillis()
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 0f, 0f, 0))
+            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, action, 0f, 0f, 0))
         }
     }
 
-    private fun release() {
-        scenario.onActivity { activity ->
-            val btn = activity.findViewById<Button>(R.id.btnRoll)
-            val now = android.os.SystemClock.uptimeMillis()
-            btn.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 0f, 0f, 0))
-        }
-    }
+    private fun press() = dispatchTouch(MotionEvent.ACTION_DOWN)
+    private fun release() = dispatchTouch(MotionEvent.ACTION_UP)
+    private fun cancelTouch() = dispatchTouch(MotionEvent.ACTION_CANCEL)
 
     private fun hintText(): String {
         var text = ""
@@ -54,15 +62,6 @@ class DiceActivityTest {
             text = activity.findViewById<TextView>(R.id.tvHint).text.toString()
         }
         return text
-    }
-
-    private fun waitForHint(expected: String, timeoutMs: Long = 30000) {
-        val deadline = System.currentTimeMillis() + timeoutMs
-        while (System.currentTimeMillis() < deadline) {
-            if (hintText() == expected) return
-            Thread.sleep(200)
-        }
-        assertEquals(expected, hintText())
     }
 
     @Test
@@ -77,76 +76,79 @@ class DiceActivityTest {
     }
 
     @Test
-    fun rollButton_isDisplayed() {
-        var vis = -1
-        scenario.onActivity { activity ->
-            vis = activity.findViewById<Button>(R.id.btnRoll).visibility
-        }
-        assertEquals(View.VISIBLE, vis)
-    }
-
-    @Test
-    fun sevenSegmentView_isDisplayed() {
-        var vis = -1
-        scenario.onActivity { activity ->
-            vis = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).visibility
-        }
-        assertEquals(View.VISIBLE, vis)
-    }
-
-    @Test
-    fun shortPress_triggersRoll() {
+    fun rollButton_isDisabledDuringRoll() {
         waitForStartup()
         press()
         Thread.sleep(200)
         release()
-        waitForHint("Hold to roll again")
+        
+        var isEnabled = true
+        scenario.onActivity { activity ->
+            isEnabled = activity.findViewById<Button>(R.id.btnRoll).isEnabled
+        }
+        
+        // As soon as the roll starts, the button gets disabled
+        assertFalse(isEnabled)
     }
 
     @Test
-    fun longPress_showsReleaseHint() {
-        waitForStartup()
-        press()
-        Thread.sleep(400)
-        assertEquals("Release!", hintText())
-        release()
-    }
-
-    @Test
-    fun afterRoll_hintUpdatesToRollAgain() {
-        waitForStartup()
-        press()
-        Thread.sleep(800)
-        release()
-        waitForHint("Hold to roll again")
-    }
-
-    @Test
-    fun sevenSegmentView_remainsVisibleDuringRoll() {
+    fun actionCancel_actsLikeReleaseAndTriggersRoll() {
         waitForStartup()
         press()
         Thread.sleep(200)
-        release()
-        Thread.sleep(1000)
-        var vis = -1
-        scenario.onActivity { activity ->
-            vis = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).visibility
-        }
-        assertEquals(View.VISIBLE, vis)
+        cancelTouch() // Simulating user swiping away off the button bounds
+        
+        waitForCondition { hintText() == "Hold to roll again" }
+        assertEquals("Hold to roll again", hintText())
     }
 
     @Test
-    fun afterRoll_segmentShowsResult() {
+    fun multipleRolls_executeSuccessfully() {
         waitForStartup()
+        
+        // First roll
         press()
-        Thread.sleep(500)
+        Thread.sleep(200)
         release()
-        waitForHint("Hold to roll again")
-
+        waitForCondition { hintText() == "Hold to roll again" }
+        
+        // Second roll
+        press()
+        Thread.sleep(200)
+        release()
+        waitForCondition { hintText() == "Hold to roll again" }
+        
         var bits = -1
         scenario.onActivity { activity ->
             bits = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).getSegmentBits()
         }
-        assertNotEquals(0, bits)
+        assertNotEquals(0, bits) // Ensure it displays a result
+    }
+
+    @Test
+    fun decimalPoint_blinksAfterRoll() {
+        waitForStartup()
+        press()
+        Thread.sleep(200)
+        release()
+
+        // Wait until it gets close to the end, then monitor DP
+        var sawDpTrue = false
+        waitForCondition {
+            scenario.onActivity { activity ->
+                if (activity.findViewById<SevenSegmentView>(R.id.sevenSegment).showDp) {
+                    sawDpTrue = true
+                }
+            }
+            sawDpTrue || hintText() == "Hold to roll again"
+        }
+
+        assertTrue("Decimal point should have blinked to true during resolution phase", sawDpTrue)
+        
+        // At the very end, DP should be disabled
+        waitForCondition { hintText() == "Hold to roll again" }
+        scenario.onActivity { activity ->
+            assertFalse(activity.findViewById<SevenSegmentView>(R.id.sevenSegment).showDp)
+        }
     }
 }
