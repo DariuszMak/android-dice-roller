@@ -69,7 +69,7 @@ class SevenSegmentViewTest {
             val view = activity.findViewById<SevenSegmentView>(R.id.sevenSegment)
             view.showDigit(8) // Turns on 0x7F
             assertEquals(0x7F, view.getSegmentBits())
-            
+
             view.clear()
             assertEquals(0, view.getSegmentBits())
         }
@@ -79,9 +79,9 @@ class SevenSegmentViewTest {
     fun showDp_togglesBooleanFlag() {
         scenario.onActivity { activity ->
             val view = activity.findViewById<SevenSegmentView>(R.id.sevenSegment)
-            
+
             assertFalse(view.showDp)
-            
+
             view.showDp = true
             assertTrue(view.showDp)
         }

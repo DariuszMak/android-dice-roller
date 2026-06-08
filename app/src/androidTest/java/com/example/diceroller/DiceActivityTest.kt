@@ -81,12 +81,12 @@ class DiceActivityTest {
         press()
         Thread.sleep(200)
         release()
-        
+
         var isEnabled = true
         scenario.onActivity { activity ->
             isEnabled = activity.findViewById<Button>(R.id.btnRoll).isEnabled
         }
-        
+
         // As soon as the roll starts, the button gets disabled
         assertFalse(isEnabled)
     }
@@ -97,7 +97,7 @@ class DiceActivityTest {
         press()
         Thread.sleep(200)
         cancelTouch() // Simulating user swiping away off the button bounds
-        
+
         waitForCondition { hintText() == "Hold to roll again" }
         assertEquals("Hold to roll again", hintText())
     }
@@ -105,19 +105,19 @@ class DiceActivityTest {
     @Test
     fun multipleRolls_executeSuccessfully() {
         waitForStartup()
-        
+
         // First roll
         press()
         Thread.sleep(200)
         release()
         waitForCondition { hintText() == "Hold to roll again" }
-        
+
         // Second roll
         press()
         Thread.sleep(200)
         release()
         waitForCondition { hintText() == "Hold to roll again" }
-        
+
         var bits = -1
         scenario.onActivity { activity ->
             bits = activity.findViewById<SevenSegmentView>(R.id.sevenSegment).getSegmentBits()
@@ -144,7 +144,7 @@ class DiceActivityTest {
         }
 
         assertTrue("Decimal point should have blinked to true during resolution phase", sawDpTrue)
-        
+
         // At the very end, DP should be disabled
         waitForCondition { hintText() == "Hold to roll again" }
         scenario.onActivity { activity ->

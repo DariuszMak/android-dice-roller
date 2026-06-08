@@ -50,7 +50,7 @@ class DiceRollLogicTest {
             val seed = (Math.random() * 1000).toInt() + 1
             val currentI = (Math.random() * 20).toInt() + 1
             val nextI = DiceLogic.calculateNextI(currentI, seed)
-            
+
             assertTrue("nextI=$nextI out of bounds", nextI in 1..20)
         }
     }
