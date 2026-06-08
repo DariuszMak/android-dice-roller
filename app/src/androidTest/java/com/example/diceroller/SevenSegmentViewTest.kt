@@ -27,7 +27,7 @@ class SevenSegmentViewTest {
 
     @Test
     fun showDigit_mapsCorrectBits() {
-        
+
         val expectedBits = mapOf(
             0 to 0x3F, 1 to 0x06, 2 to 0x5B, 3 to 0x4F, 4 to 0x66,
             5 to 0x6D, 6 to 0x7D, 7 to 0x07, 8 to 0x7F, 9 to 0x6F
@@ -41,7 +41,7 @@ class SevenSegmentViewTest {
                 assertEquals("Digit $digit failed", expectedHex, view.getSegmentBits())
             }
 
-            
+
             view.showDigit(15)
             assertEquals(0, view.getSegmentBits())
         }
@@ -52,12 +52,12 @@ class SevenSegmentViewTest {
         scenario.onActivity { activity ->
             val view = activity.findViewById<SevenSegmentView>(R.id.sevenSegment)
 
-            
+
             view.showRaw(0x7F)
             assertEquals(0x7F, view.getSegmentBits())
 
-            
-            
+
+
             view.showRaw(0xFF)
             assertEquals(0x7F, view.getSegmentBits())
         }
@@ -67,7 +67,7 @@ class SevenSegmentViewTest {
     fun clear_resetsBitsToZero() {
         scenario.onActivity { activity ->
             val view = activity.findViewById<SevenSegmentView>(R.id.sevenSegment)
-            view.showDigit(8) 
+            view.showDigit(8)
             assertEquals(0x7F, view.getSegmentBits())
 
             view.clear()
